@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,18 +65,15 @@
 
         #barcode {
             margin-top: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
+            display: none;
         }
 
-        #copyButton {
+        #downloadButton {
             margin-top: 10px;
             background-color: #28a745;
         }
 
-        #copyButton:hover {
+        #downloadButton:hover {
             background-color: #218838;
         }
     </style>
@@ -88,33 +85,29 @@
         <input type="text" id="barcodeData" placeholder="Ex : 123456789012" required>
         <button type="submit">Générer</button>
     </form>
-    <svg id="barcode"></svg>
-    <button id="copyButton" style="display: none;">Copier le code-barres</button>
+    <canvas id="barcodeCanvas"></canvas>
+    <a id="downloadButton" style="display: none;">Télécharger le code-barres</a>
 
     <script>
         document.getElementById("barcodeForm").addEventListener("submit", function(event) {
             event.preventDefault();
             const data = document.getElementById("barcodeData").value;
-            JsBarcode("#barcode", data, {
+
+            const canvas = document.getElementById("barcodeCanvas");
+            JsBarcode(canvas, data, {
                 format: "CODE128",
                 width: 2,
                 height: 100,
                 displayValue: true
             });
-            document.getElementById("copyButton").style.display = "block";
-        });
 
-        document.getElementById("copyButton").addEventListener("click", function() {
-            const svg = document.getElementById("barcode");
-            const xml = new XMLSerializer().serializeToString(svg);
-            const svgBlob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
-            const clipboardItem = [new ClipboardItem({ "image/svg+xml": svgBlob })];
-            navigator.clipboard.write(clipboardItem)
-                .then(() => alert("Le code-barres a été copié dans le presse-papiers !"))
-                .catch(err => alert("Erreur lors de la copie : " + err));
+            const downloadButton = document.getElementById("downloadButton");
+            const image = canvas.toDataURL("image/png");
+            downloadButton.href = image;
+            downloadButton.download = "code-barres.png";
+            downloadButton.style.display = "block";
+            downloadButton.textContent = "Télécharger le code-barres";
         });
     </script>
 </body>
 </html>
-
-<!-- Modifié le  12/12/2024 à 11h25 -->
